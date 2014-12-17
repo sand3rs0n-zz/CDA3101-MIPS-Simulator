@@ -8,6 +8,7 @@
 
 ; using namespace std;
 
+// Set up Initial values
 int clockCount = 128;
 int cycle = 1;
 char instruct[32];
@@ -30,6 +31,7 @@ ofstream disassembly("disassembly.txt");
 ofstream simulation("simulation.txt");
 ostringstream convert;
 
+// Print the Current clock cycle in the text document for the simulation
 void simul(){
 	simulation << "--------------------" << endl;
 	simulation << "Cycle:" << cycle << "\t" << clockCount << "\t" << instructType << regAndImm << endl;
@@ -56,6 +58,7 @@ void simul(){
 	simulation << endl;
 }
 
+// Method to convert a binary character array into the two's complement
 void twoComp(char* binary, int z){
 	if (binary[z] == '0'){
 		binary[z] = '1';
@@ -66,6 +69,7 @@ void twoComp(char* binary, int z){
 	}
 }
 
+// Method to convert a binary character array into a decimal value
 void binaryConvert32(char* instruct){
 	if (instruct[0] == '1'){
 		for (int i = 0; i < 32; i++){
@@ -87,6 +91,7 @@ void binaryConvert32(char* instruct){
 	negative = false;
 }
 
+// Method to convert an int into a ostringstream
 void numConvert(int num){
 	convert.str("");
 	convert.clear();
@@ -95,6 +100,7 @@ void numConvert(int num){
 	number = convert.str();
 }
 
+// Method to convert a decimal value into a binary character array
 void decConvert32(int regValue, char* binary){
 	if (regValue < 0){
 		negative = true;
@@ -118,6 +124,7 @@ void decConvert32(int regValue, char* binary){
 	negative = false;
 }
 
+// Method for the pseudo-MIPS Jump instruction
 void j(){
 	instructType = "J";
 	immediate = 0;
@@ -135,6 +142,7 @@ void j(){
 	}
 }
 
+// Method for the pseudo-MIPS Branch if Equal instruction
 void beq(){
 	instructType = "BEQ";
 	immediate *= 4;
@@ -153,6 +161,7 @@ void beq(){
 	}
 }
 
+// Method for the pseudo-MIPS Branch Greater than Zero instruction
 void bgtz(){
 	instructType = "BGTZ";
 	immediate *= 4;
@@ -169,6 +178,7 @@ void bgtz(){
 	}
 }
 
+// Method for the pseudo-MIPS Break instruction
 void progBreak(){
 	instructType = "BREAK";
 	
@@ -177,6 +187,7 @@ void progBreak(){
 	}
 }
 
+// Method for the pseudo-MIPS Store Word instruction
 void sw(){
 	instructType = "SW";
 	numConvert(rt);
@@ -194,6 +205,7 @@ void sw(){
 	}
 }
 
+// Method for the pseudo-MIPS Load Word instruction
 void lw(){
 	instructType = "LW";
 	numConvert(rt);
@@ -211,6 +223,7 @@ void lw(){
 	}
 }
 
+// Method for the pseudo-MIPS Addition instruction
 void add(){
 	instructType = "ADD";
 	numConvert(rd);
@@ -226,6 +239,7 @@ void add(){
 	}
 }
 
+// Method for the pseudo-MIPS Subtraction instruction
 void sub(){
 	instructType = "SUB";
 	numConvert(rd);
@@ -241,6 +255,7 @@ void sub(){
 	}
 }
 
+// Method for the pseudo-MIPS Multiplication instruction
 void mul(){
 	instructType = "MUL";
 	numConvert(rd);
@@ -256,6 +271,7 @@ void mul(){
 	}
 }
 
+// Method for the pseudo-MIPS And instruction
 void and1(){
 	instructType = "AND";
 	numConvert(rd);
@@ -283,6 +299,7 @@ void and1(){
 	}
 }
 
+// Method for the pseudo-MIPS Or instruction
 void or1(){
 	instructType = "OR";
 	numConvert(rd);
@@ -310,6 +327,7 @@ void or1(){
 	}
 }
 
+// Method for the pseudo-MIPS Xor instruction
 void xor1(){
 	instructType = "XOR";
 	numConvert(rd);
@@ -338,6 +356,7 @@ void xor1(){
 	}
 }
 
+// Method for the pseudo-MIPS Nor instruction
 void nor(){
 	instructType = "NOR";
 	numConvert(rd);
@@ -365,6 +384,7 @@ void nor(){
 	}
 }
 
+// Method for the pseudo-MIPS Add Immediate instruction
 void addi(){
 	instructType = "ADDI";
 	numConvert(rt);
@@ -380,6 +400,7 @@ void addi(){
 	}
 }
 
+// Method for the pseudo-MIPS And Immediate instruction
 void andi(){
 	instructType = "ANDI";
 	numConvert(rt);
@@ -408,6 +429,7 @@ void andi(){
 	}
 }
 
+// Method for the pseudo-MIPS Or Immediate instruction
 void ori(){
 	instructType = "ORI";
 	numConvert(rt);
@@ -436,6 +458,7 @@ void ori(){
 	}
 }
 
+// Method for the pseudo-MIPS Xor Immediate instruction
 void xori(){
 	instructType = "XORI";
 	numConvert(rt);
@@ -465,11 +488,12 @@ void xori(){
 	}
 }
 
+// Method to take Category 1 instructions, calculate proper registers and immediate values, and call the proper method
 void category1(char* instruct){
 	for (int i = 0; i < 4; i++){
 		opcode[i] = instruct[i + 2];
 	}
-	for (int i = 4; i >= 0; i--){ //Base for LW and SW
+	for (int i = 4; i >= 0; i--){ // Base value for LW and SW
 		if (instruct[i + 6] == '1')
 			rs = rs + pow(2, 4 - i);
 	}
@@ -501,6 +525,7 @@ void category1(char* instruct){
 	}
 }
 
+// Method to take Category 2 instructions, calculate proper registers, and call the proper method
 void category2(char* instruct){
 	for (int i = 0; i < 4; i++){
 		opcode[i] = instruct[i + 12];
@@ -540,6 +565,7 @@ void category2(char* instruct){
 	}
 }
 
+// Method to take Category 3 instructions, calculate proper register and immediate values, and call the proper method
 void category3(char* instruct){
 	for (int i = 0; i < 4; i++){
 		opcode[i] = instruct[i + 12];
@@ -570,14 +596,16 @@ void category3(char* instruct){
 	}
 }
 
+// Main method
 int main(int argc, _TCHAR* argv[]){
+	// Create variables for file
 	ifstream myfile;
 	string filename;
 	string fileLine;
 	vector<string> fileRead;
 	int i = 0;
-
-	cout << "Please enter a file name to read: ";
+	
+	// Read through command line file
 	cin >> filename;
 	myfile.open(filename.c_str());
 	while (!myfile.eof()){
@@ -587,7 +615,8 @@ int main(int argc, _TCHAR* argv[]){
 	}
 	myfile.close();
 
-	for (int j = 0; j < i; j++){//disassembly and simulation prep work
+	// Loop through instructions and create disassembly file and set up values for simulation run through
+	for (int j = 0; j < i; j++){
 		string instruction = fileRead[j];
 		std::copy(instruction.begin(), instruction.end(), instruct);
 		if (instructType.compare("NUMBER") == 0){
@@ -624,10 +653,11 @@ int main(int argc, _TCHAR* argv[]){
 		regAndImm = "";
 	}
 
+	// Loop through instructions second time and create the simulation of the file
 	instructType = "";
 	sim = true;
 	clockCount = 128;
-	for (int j = 0; j < i; j++){//simulation
+	for (int j = 0; j < i; j++){
 		j = ((clockCount - 128) / 4);
 		string instruction = fileRead[j];
 		std::copy(instruction.begin(), instruction.end(), instruct);
@@ -651,6 +681,8 @@ int main(int argc, _TCHAR* argv[]){
 		clockCount += 4;
 		regAndImm = "";
 	}
+
+	// Close output files
 	disassembly.close();
 	simulation.close();
 
